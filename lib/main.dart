@@ -1,7 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:googleapis/calendar/v3.dart' hide Colors;
+import 'package:googleapis_auth/auth_io.dart';
 
-void main() => runApp(MyApp());
+final accountCredentials = new ServiceAccountCredentials.fromJson({
+  // TODO: replace with service account credentials
+  "credentials":"real_credentials"
+});
+
+var _scopes = [CalendarApi.CalendarScope]; //defines the scopes for the calendar api
+
+void getCalendarEvents() {
+  clientViaServiceAccount(accountCredentials, _scopes).then((client) {
+    var calendar = new CalendarApi(client);
+    var calEvents = calendar.events.list("de.german#holiday@group.v.calendar.google.com");
+    calEvents.then((Events events) {
+      events.items.forEach((Event event) {print(event.summary);});
+    });
+  });
+}
+
+void main() =>
+    //runApp(MyApp());
+    getCalendarEvents();
 
 class MyApp extends StatelessWidget {
   @override
